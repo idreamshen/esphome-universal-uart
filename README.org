@@ -1,0 +1,32 @@
+* Core Example
+#+begin_src yaml
+external_components:
+  - source:
+      type: git
+      url: https://github.com/idreamshen/esphome-universal-uart
+      ref: v1.0.0
+
+uart:
+  - id: myuart1
+    tx_pin: 1
+    rx_pin: 3
+    baud_rate: 9600
+
+binary_sensor:
+  - platform: template
+    device_class: motion
+    name: Person Motion
+    id: test_motion
+
+universal_uart:
+  data_length: 7
+  on_data:
+    - then:
+        - logger.log: hi
+        - lambda: !lambda |-
+            if (data[0] == 4 && data[4] == 1) {
+              id(test_motion).publish_state(true);
+            } else if (data[0] == 4 && data[4] == 0) {
+              id(test_motion).publish_state(false);
+            }
+#+end_src
